@@ -1,6 +1,6 @@
 {
   "name": "gqlify",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Helper to build graphql queries from javascript objects",
   "main": "lib/index.js",
   "scripts": {
