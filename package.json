@@ -5,9 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "nofat build",
-    "nf:build": "nofat build",
-    "nf:lint": "nofat lint",
-    "nf:test": "nofat test"
+    "test": "nofat build && nofat test && nofat lint"
   },
   "repository": {
     "type": "git",
@@ -23,9 +21,10 @@
   },
   "homepage": "https://github.com/mnmtanish/gqlify#readme",
   "dependencies": {
-    "babel-polyfill": "6.5.0"
+    "babel-polyfill": "6.x.x",
+    "source-map-support": "0.4.x"
   },
   "devDependencies": {
-    "nofat": "0.4.1"
+    "nofat": "0.7.x"
   }
 }
