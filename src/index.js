@@ -17,18 +17,20 @@ export function buildQuery(fields) {
   return `{${buildFields(fields).join(',')}}`;
 }
 
-export function encodeField(name, {fields, params}) {
-  let str = name;
+export function encodeField(name, desc) {
+  let string = name;
+  let params = Array.isArray(desc) ? desc[0] : desc.params;
+  let fields = Array.isArray(desc) ? desc[1] : desc.fields;
 
   if (params) {
-    str += `(${buildParams(params).join(',')})`;
+    string += `(${buildParams(params).join(',')})`;
   }
 
   if (fields) {
-    str += `{${buildFields(fields).join(',')}}`;
+    string += `{${buildFields(fields).join(',')}}`;
   }
 
-  return str;
+  return string;
 }
 
 export function encodeParam(name, value) {

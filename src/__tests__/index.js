@@ -27,7 +27,28 @@ describe('buildQuery', function () {
   });
 });
 
-describe('encodeField', function () {
+describe('encodeField - short', function () {
+  it('should encode a field', function () {
+    expect(encodeField('foo', [])).to.equal('foo');
+  });
+
+  it('should encode a field with parameters', function () {
+    expect(encodeField('foo', [ {bar: 'baz'} ]))
+      .to.equal('foo(bar:"baz")');
+  });
+
+  it('should encode a field with sub-fields', function () {
+    expect(encodeField('foo', [ null, {f1: {}, f2: {}} ]))
+      .to.equal('foo{f1,f2}');
+  });
+
+  it('should encode a field with parameters and sub-fields', function () {
+    expect(encodeField('foo', [ {bar: 'baz'}, {f1: {}, f2: {}} ]))
+      .to.equal('foo(bar:"baz"){f1,f2}');
+  });
+});
+
+describe('encodeField - long', function () {
   it('should encode a field', function () {
     expect(encodeField('foo', {})).to.equal('foo');
   });
