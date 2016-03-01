@@ -17,8 +17,14 @@ export function buildQuery(fields) {
   return `{${buildFields(fields).join(',')}}`;
 }
 
-export function encodeField(name, desc) {
-  const parts = [ name ];
+export function encodeField(label, desc) {
+  const parts = [ ];
+
+  if (desc.field) {
+    parts.push(`${label}:${desc.field}`);
+  } else {
+    parts.push(label);
+  }
 
   if (desc.params) {
     parts.push(`(${buildParams(desc.params).join(',')})`);

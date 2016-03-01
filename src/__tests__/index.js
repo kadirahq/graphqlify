@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import {expect} from 'chai';
 import Enum from '../enum';
 
@@ -6,7 +8,7 @@ import {
   buildParams,
   buildQuery,
   encodeField,
-  encodeParam
+  encodeParam,
 } from '../';
 
 describe('buildFields', function () {
@@ -32,6 +34,10 @@ describe('encodeField', function () {
     expect(encodeField('foo', {})).to.equal('foo');
   });
 
+  it('should encode a field with a label', function () {
+    expect(encodeField('foo', {field: 'bar'})).to.equal('foo:bar');
+  });
+
   it('should encode a field with parameters', function () {
     expect(encodeField('foo', {params: {bar: 'baz'}}))
       .to.equal('foo(bar:"baz")');
@@ -42,9 +48,9 @@ describe('encodeField', function () {
       .to.equal('foo{f1,f2}');
   });
 
-  it('should encode a field with parameters and sub-fields', function () {
-    expect(encodeField('foo', {fields: {f1: {}, f2: {}}, params: {bar: 'baz'}}))
-      .to.equal('foo(bar:"baz"){f1,f2}');
+  it('should encode a field with label params and fields', function () {
+    expect(encodeField('foo', {field: 'bar', fields: {f1: {}, f2: {}}, params: {baz: 'bat'}}))
+      .to.equal('foo:bar(baz:"bat"){f1,f2}');
   });
 });
 
