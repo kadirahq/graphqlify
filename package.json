@@ -1,6 +1,6 @@
 {
   "name": "graphqlify",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Build GraphQL queries with JavaScript",
   "main": "lib/index.js",
   "scripts": {
