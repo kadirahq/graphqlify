@@ -1,6 +1,10 @@
 import Enum from './enum';
 export {default as Enum} from './enum';
 
+export default function (fields) {
+  return `{${buildFields(fields).join(',')}}`;
+}
+
 export function buildFields(info) {
   return Object.keys(info)
     .filter(name => info.hasOwnProperty(name))
@@ -11,10 +15,6 @@ export function buildParams(info) {
   return Object.keys(info)
     .filter(name => info.hasOwnProperty(name))
     .map(name => encodeParam(name, info[name]));
-}
-
-export function buildQuery(fields) {
-  return `{${buildFields(fields).join(',')}}`;
 }
 
 export function encodeField(label, desc) {

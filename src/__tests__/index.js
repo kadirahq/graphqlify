@@ -6,9 +6,9 @@ import Enum from '../enum';
 import {
   buildFields,
   buildParams,
-  buildQuery,
   encodeField,
   encodeParam,
+  default as graphqlify,
 } from '../';
 
 describe('buildFields', function () {
@@ -20,12 +20,6 @@ describe('buildFields', function () {
 describe('buildParams', function () {
   it('should return an array of encoded parameters', function () {
     expect(buildParams({foo: 'bar'})).to.deep.equal([ 'foo:"bar"' ]);
-  });
-});
-
-describe('buildQuery', function () {
-  it('should return a grqphql query string', function () {
-    expect(buildQuery({foo: {}})).to.deep.equal('{foo}');
   });
 });
 
@@ -65,5 +59,11 @@ describe('encodeParam', function () {
 
   it('should encode a enum parameter', function () {
     expect(encodeParam('foo', new Enum('BAR'))).to.equal('foo:BAR');
+  });
+});
+
+describe('graphqlify', function () {
+  it('should return a grqphql query string', function () {
+    expect(graphqlify({foo: {}})).to.deep.equal('{foo}');
   });
 });
