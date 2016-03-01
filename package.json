@@ -1,7 +1,7 @@
 {
-  "name": "gqlify",
+  "name": "graphqlify",
   "version": "0.0.1",
-  "description": "Helper to build graphql queries from javascript objects",
+  "description": "Build GraphQL queries with JavaScript",
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "nofat build",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mnmtanish/gqlify.git"
+    "url": "git+https://github.com/kadirahq/graphqlify.git"
   },
   "keywords": [
     "graphql"
@@ -17,9 +17,9 @@
   "author": "Kadira Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mnmtanish/gqlify/issues"
+    "url": "https://github.com/kadirahq/graphqlify/issues"
   },
-  "homepage": "https://github.com/mnmtanish/gqlify#readme",
+  "homepage": "https://github.com/kadirahq/graphqlify#readme",
   "dependencies": {
     "babel-polyfill": "6.x.x",
     "source-map-support": "0.4.x"
