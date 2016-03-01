@@ -36,6 +36,7 @@ const string = graphqlify({
         fields: {memberName: {}}
       },
       saiyans: {
+        field: 'members',
         params: {type: Enum('SAIYAJIN'), minPower: 9000},
         fields: {memberName: {}, powerLevel: {}}
       }
