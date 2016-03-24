@@ -4,8 +4,8 @@
   "description": "Build GraphQL queries with JavaScript",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "nofat build",
-    "test": "nofat build && nofat test && nofat lint"
+    "prepublish": "nofat make",
+    "test": "nofat test && nofat lint"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,6 @@
     "source-map-support": "0.4.x"
   },
   "devDependencies": {
-    "nofat": "0.7.x"
+    "nofat": "1.x.x"
   }
 }
