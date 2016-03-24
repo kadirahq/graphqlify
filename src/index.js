@@ -6,14 +6,12 @@ export default function (fields) {
 }
 
 export function _buildFields(info) {
-  return Object.keys(info)
-    .filter(name => info.hasOwnProperty(name))
+  return Object.getOwnPropertyNames(info)
     .map(name => _encodeField(name, info[name]));
 }
 
 export function _buildParams(info) {
-  return Object.keys(info)
-    .filter(name => info.hasOwnProperty(name))
+  return Object.getOwnPropertyNames(info)
     .map(name => _encodeParam(name, info[name]));
 }
 
@@ -38,15 +36,33 @@ export function _encodeField(label, desc) {
 }
 
 export function _encodeParam(name, value) {
-  let param = null;
+  const param = _encodeParamValue(value);
+  return `${name}:${param}`;
+}
 
-  if (typeof value === 'string') {
-    param = JSON.stringify(value);
-  } else if (typeof value === 'number') {
-    param = String(value);
-  } else if (value instanceof _enum) {
-    param = value.name;
+export function _encodeParamValue(value) {
+  if (Array.isArray(value)) {
+    const elements = value.map(_encodeParamValue);
+    return `[${elements.join(',')}]`;
   }
 
-  return `${name}:${param}`;
+  if (value instanceof _enum) {
+    return value.name;
+  }
+
+  if (typeof value === 'object') {
+    const fields = Object.getOwnPropertyNames(value)
+      .map(name => _encodeParam(name, value[name]));
+    return `{${fields.join(',')}}`;
+  }
+
+  if (typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+
+  if (typeof value === 'number') {
+    return String(value);
+  }
+
+  throw new Error('unknown param type');
 }

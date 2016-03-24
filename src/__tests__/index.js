@@ -57,8 +57,16 @@ describe('_encodeParam', function () {
     expect(_encodeParam('foo', 12345)).to.equal('foo:12345');
   });
 
-  it('should encode a enum parameter', function () {
+  it('should encode an enum parameter', function () {
     expect(_encodeParam('foo', Enum('BAR'))).to.equal('foo:BAR');
+  });
+
+  it('should encode an object parameter', function () {
+    expect(_encodeParam('foo', {bar: 'baz'})).to.equal('foo:{bar:"baz"}');
+  });
+
+  it('should encode an array parameter', function () {
+    expect(_encodeParam('foo', [ 'bar', 'baz' ])).to.equal('foo:["bar","baz"]');
   });
 });
 
