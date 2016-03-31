@@ -67,5 +67,9 @@ export function _encodeParamValue(value) {
     return String(value);
   }
 
-  throw new Error('unknown param type');
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  throw new Error('unknown param type ${typeof value} with value ${value}');
 }
