@@ -38,15 +38,15 @@ export function _encodeField(label, desc) {
 }
 
 export function _encodeParam(name, value) {
+  if (value === null) {
+    return '';
+  }
+
   const param = _encodeParamValue(value);
   return `${name}:${param}`;
 }
 
 export function _encodeParamValue(value) {
-  if (value === null) {
-    throw new Error('values cannot be null');
-  }
-
   if (Array.isArray(value)) {
     const elements = value.map(_encodeParamValue);
     return `[${elements.join(',')}]`;

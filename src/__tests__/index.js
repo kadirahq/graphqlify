@@ -50,8 +50,7 @@ describe('_encodeField', function () {
 
 describe('_encodeParam', function () {
   it('should handle null values', function () {
-    const fn = () => _encodeParam('foo', null);
-    expect(fn).to.throw('values cannot be null');
+    expect(_encodeParam('foo', null)).to.equal('');
   });
 
   it('should encode a string parameter', function () {
