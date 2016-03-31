@@ -43,6 +43,10 @@ export function _encodeParam(name, value) {
 }
 
 export function _encodeParamValue(value) {
+  if (value === null) {
+    throw new Error('values cannot be null');
+  }
+
   if (Array.isArray(value)) {
     const elements = value.map(_encodeParamValue);
     return `[${elements.join(',')}]`;
