@@ -6,12 +6,14 @@ export default function (fields) {
 }
 
 export function _buildFields(info) {
-  return Object.getOwnPropertyNames(info)
+  return Object.keys(info)
+    .filter(info.hasOwnProperty.bind(info))
     .map(name => _encodeField(name, info[name]));
 }
 
 export function _buildParams(info) {
-  return Object.getOwnPropertyNames(info)
+  return Object.keys(info)
+    .filter(info.hasOwnProperty.bind(info))
     .map(name => _encodeParam(name, info[name]));
 }
 
@@ -51,7 +53,8 @@ export function _encodeParamValue(value) {
   }
 
   if (typeof value === 'object') {
-    const fields = Object.getOwnPropertyNames(value)
+    const fields = Object.keys(value)
+      .filter(value.hasOwnProperty.bind(value))
       .map(name => _encodeParam(name, value[name]));
     return `{${fields.join(',')}}`;
   }
