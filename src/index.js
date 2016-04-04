@@ -75,5 +75,5 @@ export function _encodeParamValue(value) {
     return value;
   }
 
-  throw new Error('unknown param type ${typeof value} with value ${value}');
+  throw new Error(`unknown param type ${typeof value} with value ${value}`);
 }
