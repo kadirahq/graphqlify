@@ -1,85 +1,61 @@
 /* eslint-disable max-len */
 
 import {expect} from 'chai';
-
-import {
-  Enum,
-  default as graphqlify,
-  _buildFields,
-  _buildParams,
-  _encodeField,
-  _encodeParam,
-} from '../';
-
-describe('_buildFields', function () {
-  it('should return an array of encoded fields', function () {
-    expect(_buildFields({foo: {}})).to.deep.equal([ 'foo' ]);
-  });
-});
-
-describe('_buildParams', function () {
-  it('should return an array of encoded parameters', function () {
-    expect(_buildParams({foo: 'bar'})).to.deep.equal([ 'foo:"bar"' ]);
-  });
-});
-
-describe('_encodeField', function () {
-  it('should encode a field', function () {
-    expect(_encodeField('foo', {})).to.equal('foo');
-  });
-
-  it('should encode a field with a label', function () {
-    expect(_encodeField('foo', {field: 'bar'})).to.equal('foo:bar');
-  });
-
-  it('should encode a field with parameters', function () {
-    expect(_encodeField('foo', {params: {bar: 'baz'}}))
-      .to.equal('foo(bar:"baz")');
-  });
-
-  it('should encode a field with sub-fields', function () {
-    expect(_encodeField('foo', {fields: {f1: {}, f2: {}}}))
-      .to.equal('foo{f1,f2}');
-  });
-
-  it('should encode a field with label params and fields', function () {
-    expect(_encodeField('foo', {field: 'bar', fields: {f1: {}, f2: {}}, params: {baz: 'bat'}}))
-      .to.equal('foo:bar(baz:"bat"){f1,f2}');
-  });
-});
-
-describe('_encodeParam', function () {
-  it('should handle null values', function () {
-    expect(_encodeParam('foo', null)).to.equal('');
-  });
-
-  it('should encode a string parameter', function () {
-    expect(_encodeParam('foo', 'bar')).to.equal('foo:"bar"');
-  });
-
-  it('should encode a numeric parameter', function () {
-    expect(_encodeParam('foo', 12345)).to.equal('foo:12345');
-  });
-
-  it('should encode a boolean parameter', function () {
-    expect(_encodeParam('foo', false)).to.equal('foo:false');
-  });
-
-  it('should encode an enum parameter', function () {
-    expect(_encodeParam('foo', Enum('BAR'))).to.equal('foo:BAR');
-  });
-
-  it('should encode an object parameter', function () {
-    expect(_encodeParam('foo', {bar: 'baz'})).to.equal('foo:{bar:"baz"}');
-  });
-
-  it('should encode an array parameter', function () {
-    expect(_encodeParam('foo', [ 'bar', 'baz' ])).to.equal('foo:["bar","baz"]');
-  });
-});
+import graphqlify, {Enum} from '../';
 
 describe('graphqlify', function () {
-  it('should return a grqphql query string', function () {
-    expect(graphqlify({foo: {}})).to.deep.equal('{foo}');
+  it('should encode a simple field', function () {
+    const out = graphqlify({a: 1});
+    expect(out).to.equal('{a}');
+  });
+
+  it('should encode multiple fields', function () {
+    const out = graphqlify({a: 1, b: true, c: {}, d: null});
+    expect(out).to.equal('{a,b,c}');
+  });
+
+  it('should encode field with a label', function () {
+    const out = graphqlify({a: {field: 'b'}});
+    expect(out).to.equal('{a:b}');
+  });
+
+  it('should encode a field with nested fields', function () {
+    const out = graphqlify({a: {fields: {b: {fields: {c: 1}}}}});
+    expect(out).to.equal('{a{b{c}}}');
+  });
+
+  it('should encode field with boolean parameter', function () {
+    const out = graphqlify({a: {params: {b: false}}});
+    expect(out).to.equal('{a(b:false)}');
+  });
+
+  it('should encode field with number parameter', function () {
+    const out = graphqlify({a: {params: {b: 12.34}}});
+    expect(out).to.equal('{a(b:12.34)}');
+  });
+
+  it('should encode field with string parameter', function () {
+    const out = graphqlify({a: {params: {b: 'c'}}});
+    expect(out).to.equal('{a(b:"c")}');
+  });
+
+  it('should encode field with enum parameter', function () {
+    const out = graphqlify({a: {params: {b: Enum('c')}}});
+    expect(out).to.equal('{a(b:c)}');
+  });
+
+  it('should encode field with object parameter', function () {
+    const out = graphqlify({a: {params: {b: {c: 'd'}}}});
+    expect(out).to.equal('{a(b:{c:"d"})}');
+  });
+
+  it('should encode field with array parameter', function () {
+    const out = graphqlify({a: {params: {b: [ 'c', 'd' ]}}});
+    expect(out).to.equal('{a(b:["c","d"])}');
+  });
+
+  it('should encode a field with params and nested fields', function () {
+    const out = graphqlify({a: {params: {b: 'c'}, fields: {d: 1}}});
+    expect(out).to.equal('{a(b:"c"){d}}');
   });
 });
