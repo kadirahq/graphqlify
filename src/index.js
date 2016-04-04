@@ -2,78 +2,150 @@ import {_enum} from './enum';
 export {default as Enum} from './enum';
 
 export default function (fields) {
-  return `{${_buildFields(fields).join(',')}}`;
+  return encodeFields(fields);
 }
 
-export function _buildFields(info) {
-  return Object.keys(info)
-    .filter(info.hasOwnProperty.bind(info))
-    .map(name => _encodeField(name, info[name]));
-}
-
-export function _buildParams(info) {
-  return Object.keys(info)
-    .filter(info.hasOwnProperty.bind(info))
-    .map(name => _encodeParam(name, info[name]));
-}
-
-export function _encodeField(label, desc) {
-  const parts = [ ];
-
-  if (desc.field) {
-    parts.push(`${label}:${desc.field}`);
-  } else {
-    parts.push(label);
+// Encodes a map of fields and nested fields.
+// The output is a piece of a graphql query.
+//
+//   {a: 1, b: true, c: {}} => '{a,b,c}'
+//   {a: {fields: {b: 1}}}  => '{a{b}}'
+//
+function encodeFields(fields) {
+  if (!fields || typeof fields !== 'object') {
+    throw new Error(`fields cannot be "${fields}"`);
   }
 
-  if (desc.params) {
-    parts.push(`(${_buildParams(desc.params).join(',')})`);
+  const encoded = Object.keys(fields).filter(function (key) {
+    return fields.hasOwnProperty(key) && fields[key];
+  }).map(function (key) {
+    return encodeField(key, fields[key]);
+  });
+
+  if (encoded.length === 0) {
+    throw new Error(`fields cannot be empty`);
   }
 
-  if (desc.fields) {
-    parts.push(`{${_buildFields(desc.fields).join(',')}}`);
+  return `{${encoded.join(',')}}`;
+}
+
+// Encode a single field and nested fields.
+// The output is a piece of a graphql query.
+//
+//   ('a', 1)                 => 'a'
+//   ('a', {field: 'aa'})     => 'a:aa'
+//   ('a', {params: {b: 10}}) => 'a(b:10)'
+//   ('a', {fields: {b: 10}}) => 'a{b}'
+//
+function encodeField(key, val) {
+  if (typeof val !== 'object') {
+    return key;
+  }
+
+  const parts = [ key ];
+
+  if (val.field) {
+    parts.push(`:${val.field}`);
+  }
+  if (val.params) {
+    parts.push(encodeParams(val.params));
+  }
+  if (val.fields) {
+    parts.push(encodeFields(val.fields));
   }
 
   return parts.join('');
 }
 
-export function _encodeParam(name, value) {
-  if (value === null) {
-    return '';
+// Encodes a map of field parameters.
+//
+//   {a: 1, b: true} => '(a:1,b:true)'
+//   {a: ['b', 'c']} => '(a:["b","c"])'
+//   {a: {b: 'c'}}   => '(a:{b:"c"})'
+//
+function encodeParams(params) {
+  const encoded = encodeParamsMap(params);
+  if (encoded.length === 0) {
+    throw new Error(`params cannot be empty`);
   }
 
-  const param = _encodeParamValue(value);
-  return `${name}:${param}`;
+  return `(${encoded.join(',')})`;
 }
 
-export function _encodeParamValue(value) {
-  if (Array.isArray(value)) {
-    const elements = value.map(_encodeParamValue);
-    return `[${elements.join(',')}]`;
+// Encodes an object type field parameter.
+//
+//   {a: {b: {c: 10}}} => '{a:{b:{c:10}}}'
+//   {a: {b: false}}   => '{a:{b:false}}'
+//
+function encodeParamsObject(params) {
+  const encoded = encodeParamsMap(params);
+  return `{${encoded.join(',')}}`;
+}
+
+// Encodes an array type field parameter.
+//
+//   [1, 2, 3]          => '[1,2,3]'
+//   [ {a: 1}, {a: 2} ] => '[{a:1},{a:2}]'
+//
+function encodeParamsArray(array) {
+  const encoded = array.map(encodeParamValue);
+  return `[${encoded.join(',')}]`;
+}
+
+// Encodes a map of field parameters.
+//
+//   {a: 1, b: true} => 'a:1,b:true'
+//   {a: ['b', 'c']} => 'a:["b","c"]'
+//   {a: {b: 'c'}}   => 'a:{b:"c"}'
+//
+function encodeParamsMap(params) {
+  if (!params || typeof params !== 'object') {
+    throw new Error(`params cannot be "${params}"`);
   }
 
+  const keys = Object.keys(params).filter(function (key) {
+    const val = params[key];
+    return params.hasOwnProperty(key) &&
+      val !== undefined &&
+      val !== null &&
+      !Number.isNaN(val);
+  });
+
+  return keys.map(key => encodeParam(key, params[key]));
+}
+
+// Encodes a single parameter
+//
+//    ('a', 1) => 'a:1'
+//
+function encodeParam(key, val) {
+  return `${key}:${encodeParamValue(val)}`;
+}
+
+// Encodes parameter value
+//
+//   'a'       => '"a"'
+//   Enum('a') => 'a'
+//
+function encodeParamValue(value) {
+  if (Array.isArray(value)) {
+    return encodeParamsArray(value);
+  }
   if (value instanceof _enum) {
     return value.name;
   }
-
   if (typeof value === 'object') {
-    const fields = Object.keys(value)
-      .filter(value.hasOwnProperty.bind(value))
-      .map(name => _encodeParam(name, value[name]));
-    return `{${fields.join(',')}}`;
+    return encodeParamsObject(value);
   }
-
   if (typeof value === 'string') {
     return JSON.stringify(value);
   }
-
   if (typeof value === 'number') {
     return String(value);
   }
-
   if (typeof value === 'boolean') {
     return value;
   }
 
-  throw new Error(`unknown param type ${typeof value} with value ${value}`);
+  throw new Error(`unsupported param type "${typeof value}"`);
 }
