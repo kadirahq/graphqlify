@@ -20,11 +20,7 @@
     "url": "https://github.com/kadirahq/graphqlify/issues"
   },
   "homepage": "https://github.com/kadirahq/graphqlify#readme",
-  "dependencies": {
-    "babel-polyfill": "6.x.x",
-    "source-map-support": "0.4.x"
-  },
   "devDependencies": {
-    "nofat": "1.x.x"
+    "nofat": "^2.0.0"
   }
 }
