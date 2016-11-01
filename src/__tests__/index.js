@@ -59,3 +59,27 @@ describe('graphqlify', function () {
     expect(out).to.equal('{a(b:"c"){d}}');
   });
 });
+
+describe('query', function () {
+  it('should encode a graphql query', function () {
+    const out = graphqlify.query({a: 1});
+    expect(out).to.equal('query{a}');
+  });
+
+  it('should encode a named graphql query', function () {
+    const out = graphqlify.query('q1', {a: 1});
+    expect(out).to.equal('query q1{a}');
+  });
+});
+
+describe('mutation', function () {
+  it('should encode a graphql mutation', function () {
+    const out = graphqlify.mutation({a: 1});
+    expect(out).to.equal('mutation{a}');
+  });
+
+  it('should encode a named graphql mutation', function () {
+    const out = graphqlify.mutation('m1', {a: 1});
+    expect(out).to.equal('mutation m1{a}');
+  });
+});
