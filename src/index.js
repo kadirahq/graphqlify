@@ -1,15 +1,71 @@
 import {_enum} from './enum';
 export {default as Enum} from './enum';
 
-export default function (fields) {
-  return encodeFields(fields);
+// Encodes a graphql query
+const graphqlify = function (fields) {
+  return encodeOperation('', fields);
+};
+
+// Encodes a graphql query
+graphqlify.query = function (_nameOrFields, _fieldsOrNil) {
+  return encodeOperation('query', _nameOrFields, _fieldsOrNil);
+};
+
+// Encodes a graphql mutation
+graphqlify.mutation = function (_nameOrFields, _fieldsOrNil) {
+  return encodeOperation('mutation', _nameOrFields, _fieldsOrNil);
+};
+
+// default export graphqlify
+export default graphqlify;
+
+// Encodes a graphql operation and fragments
+// The output is a complete graphql query.
+//
+//   {a: {fields: {b: 1}}}  => '{a{b}}'
+//   'mutation', {a: {fields: {b: 1}}}  => 'mutation{a{b}}'
+//
+function encodeOperation(type, _nameOrFields, _fieldsOrNil) {
+  let name = _nameOrFields;
+  let fields = _fieldsOrNil;
+  if (!_fieldsOrNil && typeof _nameOrFields === 'object') {
+    name = null;
+    fields = _nameOrFields;
+  }
+
+  const parts = [];
+
+  // stringifying the main query object
+  const fieldset = encodeFieldset(fields);
+
+  if (name) {
+    parts.push(`${type} ${name}${fieldset}`);
+  } else {
+    parts.push(`${type}${fieldset}`);
+  }
+
+  return parts.join('\n');
 }
 
-// Encodes a map of fields and nested fields.
+// Encodes a group of fields and fragments
 // The output is a piece of a graphql query.
 //
 //   {a: 1, b: true, c: {}} => '{a,b,c}'
 //   {a: {fields: {b: 1}}}  => '{a{b}}'
+//
+function encodeFieldset(fields) {
+  const parts = [];
+  if (fields) {
+    parts.push(encodeFields(fields));
+  }
+  return `{${parts.join(',')}}`;
+}
+
+// Encodes a set of fields and nested fields.
+// The output is a piece of a graphql query.
+//
+//   {a: 1, b: true, c: {}} => 'a,b,c'
+//   {a: {fields: {b: 1}}}  => 'a{b}'
 //
 function encodeFields(fields) {
   if (!fields || typeof fields !== 'object') {
@@ -26,7 +82,7 @@ function encodeFields(fields) {
     throw new Error(`fields cannot be empty`);
   }
 
-  return `{${encoded.join(',')}}`;
+  return encoded.join(',');
 }
 
 // Encode a single field and nested fields.
@@ -51,7 +107,7 @@ function encodeField(key, val) {
     parts.push(encodeParams(val.params));
   }
   if (val.fields) {
-    parts.push(encodeFields(val.fields));
+    parts.push(encodeFieldset(val.fields));
   }
 
   return parts.join('');
