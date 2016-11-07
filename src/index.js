@@ -69,9 +69,29 @@ function findFieldFragments(field) {
   let fragments = [];
   if (field.fragments) {
     fragments = fragments.concat(field.fragments);
+    field.fragments.forEach(frag => {
+      const fragFragments = findFragFragments(frag);
+      fragments = fragments.concat(fragFragments);
+    });
   }
   if (field.fields) {
     fragments = fragments.concat(findFragments(field.fields));
+  }
+  return fragments;
+}
+
+// TODO add function description
+function findFragFragments(frag) {
+  let fragments = [];
+  if (frag.fragments) {
+    fragments = fragments.concat(frag.fragments);
+    frag.fragments.forEach(nestedFrag => {
+      const fragFragments = findFragFragments(nestedFrag);
+      fragments = fragments.concat(fragFragments);
+    });
+  }
+  if (frag.fields) {
+    fragments = fragments.concat(findFragments(frag.fields));
   }
   return fragments;
 }
