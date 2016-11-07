@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
 import {expect} from 'chai';
-import graphqlify, {Enum} from '../';
+import graphqlify, {Enum, Fragment} from '../';
 
 describe('graphqlify', function () {
   it('should encode a simple field', function () {
@@ -57,6 +57,16 @@ describe('graphqlify', function () {
   it('should encode a field with params and nested fields', function () {
     const out = graphqlify({a: {params: {b: 'c'}, fields: {d: 1}}});
     expect(out).to.equal('{a(b:"c"){d}}');
+  });
+
+  it('should encode a field with a fragment', function () {
+    const frag = Fragment({
+      name: 'fragname',
+      type: 'FragType',
+      fields: {b: 1},
+    });
+    const out = graphqlify({a: {fragments: [ frag ]}});
+    expect(out).to.equal('{a{...fragname}},fragment fragname on FragType{b}');
   });
 });
 
