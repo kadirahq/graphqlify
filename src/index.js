@@ -1,5 +1,8 @@
 import {_enum} from './enum';
+// import {_fragment} from './fragment';
+
 export {default as Enum} from './enum';
+export {default as Fragment} from './fragment';
 
 // Encodes a graphql query
 const graphqlify = function (fields) {
@@ -36,7 +39,7 @@ function encodeOperation(type, _nameOrFields, _fieldsOrNil) {
   const parts = [];
 
   // stringifying the main query object
-  const fieldset = encodeFieldset(fields);
+  const fieldset = encodeFieldset(fields, null);
 
   if (name) {
     parts.push(`${type} ${name}${fieldset}`);
@@ -44,7 +47,64 @@ function encodeOperation(type, _nameOrFields, _fieldsOrNil) {
     parts.push(`${type}${fieldset}`);
   }
 
-  return parts.join('\n');
+  const fragments = findFragments(fields);
+  if (fragments.length) {
+    parts.push(encodeFragments(fragments));
+  }
+
+  return parts.join(',');
+}
+
+// TODO add function description
+function findFragments(fields) {
+  const fragments = Object.keys(fields)
+    .filter(key => fields[key] && typeof fields[key] === 'object')
+    .map(key => findFieldFragments(fields[key]))
+    .reduce((a, b) => a.concat(b), []);
+  return Array.from(new Set(fragments));
+}
+
+// TODO add function description
+function findFieldFragments(field) {
+  let fragments = [];
+  if (field.fragments) {
+    fragments = fragments.concat(field.fragments);
+    field.fragments.forEach(frag => {
+      const fragFragments = findFragFragments(frag);
+      fragments = fragments.concat(fragFragments);
+    });
+  }
+  if (field.fields) {
+    fragments = fragments.concat(findFragments(field.fields));
+  }
+  return fragments;
+}
+
+// TODO add function description
+function findFragFragments(frag) {
+  let fragments = [];
+  if (frag.fragments) {
+    fragments = fragments.concat(frag.fragments);
+    frag.fragments.forEach(nestedFrag => {
+      const fragFragments = findFragFragments(nestedFrag);
+      fragments = fragments.concat(fragFragments);
+    });
+  }
+  if (frag.fields) {
+    fragments = fragments.concat(findFragments(frag.fields));
+  }
+  return fragments;
+}
+
+// TODO add function description
+function encodeFragments(fragments) {
+  return fragments.map(f => encodeFragment(f)).join(',');
+}
+
+// TODO add function description
+function encodeFragment(fragment) {
+  const fieldset = encodeFieldset(fragment.fields, fragment.fragments);
+  return `fragment ${fragment.name} on ${fragment.type}${fieldset}`;
 }
 
 // Encodes a group of fields and fragments
@@ -53,10 +113,13 @@ function encodeOperation(type, _nameOrFields, _fieldsOrNil) {
 //   {a: 1, b: true, c: {}} => '{a,b,c}'
 //   {a: {fields: {b: 1}}}  => '{a{b}}'
 //
-function encodeFieldset(fields) {
+function encodeFieldset(fields, fragments) {
   const parts = [];
   if (fields) {
     parts.push(encodeFields(fields));
+  }
+  if (fragments) {
+    fragments.forEach(f => parts.push(`...${f.name}`));
   }
   return `{${parts.join(',')}}`;
 }
@@ -106,8 +169,8 @@ function encodeField(key, val) {
   if (val.params) {
     parts.push(encodeParams(val.params));
   }
-  if (val.fields) {
-    parts.push(encodeFieldset(val.fields));
+  if (val.fields || val.fragments) {
+    parts.push(encodeFieldset(val.fields, val.fragments));
   }
 
   return parts.join('');
