@@ -1,7 +1,7 @@
 {
-  "name": "graphqlify",
+  "name": "graphqlify-null",
   "version": "1.1.0",
-  "description": "Build GraphQL queries with JavaScript",
+  "description": "Build GraphQL queries with JavaScript (fork of graphqlify)",
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "nofat make",
@@ -9,17 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kadirahq/graphqlify.git"
+    "url": "git+https://github.com/Eiskis/graphqlify.git"
   },
   "keywords": [
     "graphql"
   ],
-  "author": "Kadira Inc.",
+  "author": "Eiskis",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kadirahq/graphqlify/issues"
+    "url": "https://github.com/Eiskis/graphqlify/issues"
   },
-  "homepage": "https://github.com/kadirahq/graphqlify#readme",
+  "homepage": "https://github.com/Eiskis/graphqlify#readme",
   "devDependencies": {
     "nofat": "^2.0.0"
   }
