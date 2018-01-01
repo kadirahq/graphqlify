@@ -226,7 +226,7 @@ function encodeParamsMap(params) {
     const val = params[key];
     return params.hasOwnProperty(key) &&
       val !== undefined &&
-      val !== null &&
+      // val !== null &&
       !Number.isNaN(val);
   });
 
@@ -247,6 +247,9 @@ function encodeParam(key, val) {
 //   Enum('a') => 'a'
 //
 function encodeParamValue(value) {
+  if (value === null) {
+    return null;
+  }
   if (Array.isArray(value)) {
     return encodeParamsArray(value);
   }

@@ -1,3 +1,7 @@
+# graphqlify-null
+
+Fork of `graphqlify` that allows sending null values. Because who knows if [#8](https://github.com/kadirahq/graphqlify/pull/8) will ever be merged.
+
 # graphqlify
 
 This module helps you build GraphQL queries using plain JavaScript objects. This can be useful when you need to programmatically build GraphQL queries. Install the module from npm to get started.
